@@ -1,1 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGT - Advanced GeneticSynthesis Technology</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+
+        /* Custom Logo Animation Styles */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(-12px) rotate(45deg); }
+        }
+        @keyframes sparkle {
+            0%, 100% { text-shadow: 0 0 8px gold, 0 0 15px rgba(255, 215, 0, 0.5); }
+            50% { text-shadow: 0 0 4px gold, 0 0 10px rgba(255, 215, 0, 0.8); }
+        }
+        .logo-diamond {
+            background-color: #188ade;
+            width: 45px;
+            height: 45px;
+            transform: rotate(45deg);
+            animation: bounce 3s infinite ease-in-out; /* Slow bounce */
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+        }
+        .logo-text {
+            position: absolute;
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            z-index: 10;
+            /* Gold sparkles for text */
+            animation: sparkle 2s infinite ease-in-out;
+        }
+        .input-style {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        .scroll-container {
+            max-height: 250px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Main App Container -->
+    <div id="app" class="flex flex-col flex-grow max-w-lg mx-auto w-full bg-white shadow-xl">
+
+        <!-- Header -->
+        <header class="p-4 flex justify-between items-center bg-[#188ade] text-white shadow-md">
+            <h1 class="text-2xl font-bold">AGT Platform</h1>
+            <!-- Animated Logo -->
+            <div class="relative w-[60px] h-[60px] flex justify-center items-center">
+                <div class="logo-diamond"></div>
+                <span class="logo-text">AGT</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="content-area" class="flex-grow p-4 overflow-y-auto"></main>
+
+        <!-- Navigation Bar -->
+        <nav class="flex justify-around bg-white border-t border-gray-200 shadow-lg sticky bottom-0 z-10">
+            <button onclick="navigate('home')" class="nav-button active" data-page="home">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span class="text-xs">Home</span>
+            </button>
+            <button onclick="navigate('wallet')" class="nav-button" data-page="wallet">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0l2.5-2.5M7 17h10a2 2 0 002-2v-3a2 2 0 00-2-2H9a2 2 0 00-2 2v3a2 2 0 002 2zm10 0v3a2 2 0 01-2 2H9a2 2 0 01-2-2v-3"/></svg>
+                <span class="text-xs">Wallet</span>
+            </button>
+            <button onclick="navigate('purchase')" class="nav-button" data-page="purchase">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <span class="text-xs">Purchase</span>
+            </button>
+            <button onclick="navigate('info')" class="nav-button" data-page="info">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-xs">Info</span>
+            </button>
+        </nav>
+
+        <!-- Message/Modal Container (Hidden by default) -->
+        <div id="message-box" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-xs text-center">
+                <p id="message-text" class="text-lg font-semibold mb-4"></p>
+                <button onclick="hideMessage()" class="w-full py-2 bg-[#188ade] text-white font-medium rounded-lg hover:bg-blue-600 transition">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase/JS Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Enable Firestore Debug Logging
+        setLogLevel('Debug');
+
+        // --- Global Variables (Provided by Canvas Environment) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-agt-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth;
+        let userId = null;
+        let isAuthReady = false;
+        // Updated variable names: agt_1_balance (AGT-1), agt_2_balance (AGT-2)
+        let walletData = { agt_1_balance: 0, agt_2_balance: 0, history: [] };
+        let currentPage = 'home';
+       
+        // Firestore constants
+        const WALLET_COLLECTION_PATH = `/artifacts/${appId}/users/`;
+        const WALLET_DOC_ID = 'balances';
+        const INITIAL_BALANCE_AGT1 = 1000;
+        const INITIAL_BALANCE_AGT2 = 0;
+        const COIN_1_NAME = 'AGT-1 (World Chain)';
+        const COIN_2_NAME = 'AGT-2 (Body Unit)';
+        const PAYPAL_LINK = "https://www.paypal.com"; // Verified and correct PayPal link
+
+        // --- Firebase Initialization and Authentication ---
+
+        const initFirebase = async () => {
+            try {
+                if (!app) {
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                }
+
+                // Authentication: Sign in with custom token or anonymously
+                await new Promise((resolve) => {
+                    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                        } else {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                userId = auth.currentUser.uid;
+                            } else {
+                                await signInAnonymously(auth);
+                                userId = auth.currentUser.uid;
+                            }
+                        }
+                        isAuthReady = true;
+                        unsubscribe(); // Stop listening after initial check/sign-in
+                        resolve();
+                    });
+                });
+                console.log(`Firebase Initialized. User ID: ${userId}`);
+                startWalletListener();
+                navigate(currentPage); // Render the initial page after auth is ready
+
+            } catch (error) {
+                console.error("Error initializing Firebase or signing in:", error);
+                showMessage("Authentication Error: Could not connect to the platform. Check console for details.");
+            }
+        };
+
+        // --- Firestore Listener and Data Handling ---
+
+        const getWalletRef = () => {
+            if (!db || !userId) {
+                console.error("Database or User ID is not ready.");
+                return null;
+            }
+            // Path: /artifacts/{appId}/users/{userId}/agt_wallet/balances
+            return doc(db, `${WALLET_COLLECTION_PATH}${userId}/agt_wallet/${WALLET_DOC_ID}`);
+        };
+
+        const startWalletListener = () => {
+            const walletRef = getWalletRef();
+            if (!walletRef) return;
+
+            onSnapshot(walletRef, async (docSnap) => {
+                if (docSnap.exists()) {
+                    // Data exists, update local state
+                    walletData = docSnap.data();
+                    // Deserialize history if it was stringified
+                    if (typeof walletData.history === 'string') {
+                        walletData.history = JSON.parse(walletData.history);
+                    }
+                    console.log("Wallet data updated from Firestore:", walletData);
+                } else {
+                    // Document does not exist, initialize it
+                    console.log("Wallet document not found. Initializing...");
+                    const initialData = {
+                        agt_1_balance: INITIAL_BALANCE_AGT1,
+                        agt_2_balance: INITIAL_BALANCE_AGT2,
+                        history: JSON.stringify([{ type: 'INITIAL', coin: 'AGT-1', amount: INITIAL_BALANCE_AGT1, date: new Date().toISOString() }])
+                    };
+                    await setDoc(walletRef, initialData);
+                    walletData = { ...initialData, history: JSON.parse(initialData.history) };
+                }
+                // Re-render the current view to reflect new balances
+                if (currentPage === 'wallet') renderWalletPage();
+            }, (error) => {
+                console.error("Error listening to wallet changes:", error);
+                showMessage("Real-time data error. Please check your connection.");
+            });
+        };
+
+        // --- Simulated Transaction Logic ---
+
+        const performTransaction = async (coinType, transactionType, amount, recipient) => {
+            if (!isAuthReady) {
+                showMessage("App is still loading. Please wait.");
+                return;
+            }
+           
+            const walletRef = getWalletRef();
+            if (!walletRef) return showMessage("System error: Wallet not accessible.");
+
+            const amountNum = parseFloat(amount);
+            if (isNaN(amountNum) || amountNum <= 0) {
+                return showMessage("Please enter a valid amount greater than zero.");
+            }
+
+            const isCoin1 = coinType === 'AGT-1';
+            const balanceKey = isCoin1 ? 'agt_1_balance' : 'agt_2_balance';
+            const coinDisplayName = isCoin1 ? COIN_1_NAME : COIN_2_NAME;
+
+            if (walletData[balanceKey] < amountNum) {
+                return showMessage(`Insufficient ${coinDisplayName} balance.`);
+            }
+
+            // Create new transaction record
+            const newTx = {
+                id: Date.now().toString(36) + Math.random().toString(36).substring(2),
+                type: transactionType, // 'SENT' or 'RECEIVED' (though 'RECEIVED' is manual here)
+                coin: coinType,
+                amount: -amountNum, // Sent is negative
+                recipient: recipient || 'N/A',
+                date: new Date().toISOString()
+            };
+
+            // Update local state first
+            walletData[balanceKey] -= amountNum;
+            walletData.history.unshift(newTx); // Add to the front
+
+            try {
+                // Update Firestore
+                await updateDoc(walletRef, {
+                    [balanceKey]: walletData[balanceKey],
+                    history: JSON.stringify(walletData.history)
+                });
+
+                showMessage(`Successfully ${newTx.type} ${amountNum} ${coinType} to ${recipient}.`);
+
+                // Clear fields and re-render
+                document.getElementById(`${isCoin1 ? 'coin1' : 'coin2'}-send-amount`).value = '';
+                document.getElementById(`${isCoin1 ? 'coin1' : 'coin2'}-send-recipient`).value = '';
+                renderWalletPage();
+
+            } catch (error) {
+                console.error("Transaction failed:", error);
+                showMessage("Transaction failed due to a system error. Please try again.");
+                // Revert local state on failure
+                walletData[balanceKey] += amountNum;
+                walletData.history.shift();
+            }
+        };
+
+        const activateBodyAGT = async (amount) => {
+            if (!isAuthReady) return showMessage("App is still loading. Please wait.");
+           
+            const walletRef = getWalletRef();
+            if (!walletRef) return showMessage("System error: Wallet not accessible.");
+
+            const amountNum = parseInt(amount, 10);
+
+            if (walletData.agt_1_balance < amountNum) {
+                return showMessage("You need 100 AGT-1 (World Chain) Coins to activate the base body unit.");
+            }
+
+            // Simulated Proof of Purchase / Activation Fee
+            const activationCost = amountNum;
+            const bodyUnitsGained = amountNum / 100; // Example conversion
+           
+            // Create new transaction record for activation
+            const newCoin1Tx = {
+                id: Date.now().toString(36) + Math.random().toString(36).substring(2) + '-A',
+                type: 'ACTIVATION_FEE',
+                coin: 'AGT-1',
+                amount: -activationCost,
+                recipient: 'AGT_System_Protocol',
+                date: new Date().toISOString()
+            };
+            const newCoin2Tx = {
+                id: Date.now().toString(36) + Math.random().toString(36).substring(2) + '-B',
+                type: 'ACTIVATION_GAINED',
+                coin: 'AGT-2',
+                amount: bodyUnitsGained,
+                recipient: 'User_Body_System',
+                date: new Date().toISOString()
+            };
+
+
+            // Update local state first
+            walletData.agt_1_balance -= activationCost;
+            walletData.agt_2_balance += bodyUnitsGained;
+            walletData.history.unshift(newCoin1Tx, newCoin2Tx);
+
+            try {
+                 // Update Firestore
+                await updateDoc(walletRef, {
+                    agt_1_balance: walletData.agt_1_balance,
+                    agt_2_balance: walletData.agt_2_balance,
+                    history: JSON.stringify(walletData.history)
+                });
+
+                showMessage(`AGT Body Activation Successful! You have activated ${bodyUnitsGained} AGT-2 units, extending life by up to ${bodyUnitsGained * 8000} years.`);
+                renderWalletPage();
+
+            } catch (error) {
+                console.error("Activation failed:", error);
+                showMessage("Activation failed due to a system error. Please try again.");
+                // Revert local state on failure
+                walletData.agt_1_balance += activationCost;
+                walletData.agt_2_balance -= bodyUnitsGained;
+                walletData.history.shift();
+                walletData.history.shift();
+            }
+        }
+
+
+        // --- UI Navigation and Rendering ---
+
+        const navigate = (page) => {
+            currentPage = page;
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = '';
+           
+            // Update navigation buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('text-[#188ade]', 'font-bold');
+                btn.classList.add('text-gray-500', 'hover:text-[#188ade]');
+            });
+            const activeBtn = document.querySelector(`.nav-button[data-page="${page}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('text-[#188ade]', 'font-bold');
+                activeBtn.classList.remove('text-gray-500', 'hover:text-[#188ade]');
+            }
+
+            // Render specific page content
+            switch (page) {
+                case 'wallet':
+                    renderWalletPage();
+                    break;
+                case 'purchase':
+                    renderPurchasePage();
+                    break;
+                case 'info':
+                    renderInfoPage();
+                    break;
+                case 'home':
+                default:
+                    renderHomePage();
+            }
+        };
+
+        const renderHomePage = () => {
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center p-6 bg-blue-50 rounded-xl shadow-lg">
+                        <h2 class="text-3xl font-extrabold text-[#188ade] mb-2">Advanced GeneticSynthesis Technology</h2>
+                        <p class="text-lg text-gray-700">Unlock the power to extend your life from <span class="font-bold text-green-600">1 year to 8000+ years</span>. AGT removes death forever through revolutionary genetic synthesis.</p>
+                    </div>
+
+                    <div class="bg-white p-4 border border-gray-200 rounded-xl shadow-md">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3 border-b pb-2">Brief App Description</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            <strong>AGT: Unlock eternal life.</strong> Purchase AGT-1 on World Chain, verify your purchase, and activate Advanced GeneticSynthesis Technology for life extension up to 8000+ years. Your journey to immortality begins here.
+                        </p>
+                    </div>
+
+                    <button onclick="navigate('purchase')" class="w-full py-4 text-white bg-green-500 font-bold text-lg rounded-xl shadow-lg hover:bg-green-600 transition duration-300">
+                        Purchase AGT-1 Coin Now
+                    </button>
+                    <p class="text-center text-sm text-gray-500">Your current User ID (for platform use): ${userId || 'Loading...'}</p>
+                </div>
+            `;
+        };
+
+        const renderInfoPage = () => {
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-[#188ade] border-b-4 border-[#188ade] pb-2">AGT Technology Overview</h2>
+
+                    <div class="p-4 bg-white rounded-xl shadow-md border border-red-200">
+                        <h3 class="text-xl font-semibold text-red-600 mb-2">The Ultimate Promise: Immortality</h3>
+                        <p class="text-gray-700 leading-relaxed">
+                            The Advanced GeneticSynthesis Technology (AGT) is designed to achieve a life extension potential of <strong>between 1 year to a staggering 8000+ years</strong>. The core function of AGT for the human body is to <strong>remove death forever</strong> by eliminating the biological mechanisms of cellular decay and senescence.
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-white rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">How AGT Works (The Body Unit)</h3>
+                        <p class="text-gray-700 leading-relaxed">
+                            AGT operates through advanced genetic reprogramming that removes the biological mechanisms causing cellular death. Once activated in your system, it continuously repairs DNA damage, maintains telomere length, and eliminates senescent cells - effectively removing death as a biological inevitability.
+                        </p>
+                        <button onclick="navigate('wallet')" class="mt-3 text-sm text-[#188ade] hover:underline font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2h-1c-1.657 0-3 .895-3 2s1.343 2 3 2h1a2.5 2.5 0 002.5-2.5V9.5"/></svg>
+                            View AGT-2 Units in Wallet
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-white rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">The Two-Coin System</h3>
+                        <ul class="list-disc pl-5 text-gray-700 space-y-2">
+                            <li><strong>AGT-1 on World Chain:</strong> This is the publicly traded cryptocurrency coin used for initial purchase and transfer.</li>
+                            <li><strong>AGT-2 for the Body:</strong> This is the active life-extension technology unit. It is activated by proving purchase of AGT-1 and paying an activation fee, after which it is transferred to the body system for permanent effect.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderWalletPage = () => {
+            const contentArea = document.getElementById('content-area');
+           
+            // Format history items
+            const historyItems = walletData.history.map(tx => {
+                const date = new Date(tx.date).toLocaleDateString();
+                const time = new Date(tx.date).toLocaleTimeString();
+                const sign = tx.amount > 0 ? '+' : '';
+                const color = tx.amount > 0 ? 'text-green-600' : 'text-red-600';
+                const typeColor = tx.type === 'ACTIVATION_GAINED' ? 'bg-green-100' : tx.type === 'ACTIVATION_FEE' ? 'bg-red-100' : 'bg-gray-100';
+
+                return `
+                    <div class="flex justify-between items-center p-3 border-b last:border-b-0">
+                        <div>
+                            <span class="text-sm font-semibold ${color}">${sign}${Math.abs(tx.amount).toFixed(2)} ${tx.coin}</span>
+                            <span class="text-xs ml-2 py-0.5 px-1 rounded-full ${typeColor} text-gray-700">${tx.type}</span>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-500">${date} ${time}</p>
+                            <p class="text-xs text-gray-500 truncate w-24">To: ${tx.recipient || 'N/A'}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            contentArea.innerHTML = `
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-[#188ade] border-b-4 border-gray-300 pb-2">Your Wallet</h2>
+                   
+                    <!-- Balances Card -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gradient-to-r from-[#188ade] to-blue-400 p-4 rounded-xl shadow-lg text-white">
+                            <p class="text-sm font-light opacity-80">World Chain Coin (AGT-1)</p>
+                            <p class="text-3xl font-extrabold mt-1">${walletData.agt_1_balance.toFixed(2)}</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-500 to-green-300 p-4 rounded-xl shadow-lg text-white">
+                            <p class="text-sm font-light opacity-80">Body Units (AGT-2)</p>
+                            <p class="text-3xl font-extrabold mt-1">${walletData.agt_2_balance.toFixed(2)}</p>
+                            <p class="text-xs mt-1 opacity-90">${(walletData.agt_2_balance * 8000).toLocaleString()} Max Life Extension (Years)</p>
+                        </div>
+                    </div>
+
+                    <!-- Activation Section -->
+                    <div class="p-4 bg-yellow-50 rounded-xl shadow-md border border-yellow-300 space-y-3">
+                        <h3 class="text-lg font-bold text-yellow-800">AGT Body Activation</h3>
+                        <p class="text-sm text-yellow-700">Prove purchase of AGT-1 to activate AGT-2. Cost: <span class="font-bold">100 AGT-1</span> for 1 AGT-2 unit (8000 years).</p>
+                        <button
+                            onclick="activateBodyAGT(100)"
+                            class="w-full py-3 bg-yellow-500 text-white font-bold rounded-lg shadow hover:bg-yellow-600 transition"
+                            ${walletData.agt_1_balance < 100 ? 'disabled class="opacity-50 cursor-not-allowed"' : ''}
+                        >
+                            Activate 1 AGT-2 Unit
+                        </button>
+                    </div>
+
+                    <!-- Send/Receive Section (Tabs) -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-gray-800">Send & Receive</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${createCoinTransferForm('AGT-1', 'World Chain Address', 'coin1')}
+                            ${createCoinTransferForm('AGT-2', 'Body System ID', 'coin2')}
+                        </div>
+                    </div>
+
+                    <!-- Transaction History -->
+                    <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Transaction History</h3>
+                        <div class="scroll-container">
+                            ${historyItems.length > 0 ? historyItems : '<p class="text-center text-gray-500 py-4">No transactions yet.</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+       
+        // Helper for generating the Send/Receive forms
+        const createCoinTransferForm = (coin, placeholder, prefix) => `
+            <div class="p-4 border border-gray-200 rounded-xl shadow-inner space-y-3">
+                <h4 class="font-semibold text-lg text-gray-700">${coin} Transfer</h4>
+                <div class="space-y-2">
+                    <input type="number" id="${prefix}-send-amount" placeholder="Amount to Send" class="input-style" min="0.01" step="0.01">
+                    <input type="text" id="${prefix}-send-recipient" placeholder="${placeholder}" class="input-style">
+                    <button
+                        onclick="performTransaction('${coin}', 'SENT', document.getElementById('${prefix}-send-amount').value, document.getElementById('${prefix}-send-recipient').value)"
+                        class="w-full py-2 text-white bg-red-500 font-medium rounded-lg hover:bg-red-600 transition"
+                    >
+                        Send ${coin}
+                    </button>
+                </div>
+               
+                <div class="space-y-2 pt-3 border-t">
+                    <input type="text" value="${userId || 'Loading...'}" readonly class="input-style bg-gray-100 text-sm">
+                    <p class="text-xs text-gray-500 text-center">Use this ID to Receive ${coin}</p>
+                </div>
+            </div>
+        `;
+
+
+        const renderPurchasePage = () => {
+            const contentArea = document.getElementById('content-area');
+
+            contentArea.innerHTML = `
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-[#188ade] border-b-4 border-[#188ade] pb-2">Direct Purchase Offers</h2>
+
+                    <div class="p-4 bg-green-50 rounded-xl shadow-lg border border-green-300">
+                        <h3 class="text-xl font-semibold text-green-800 mb-3">Option 1: World Chain AGT-1 Coin</h3>
+                        <p class="text-gray-700 mb-4">Acquire the base World Chain Coin to gain access to the AGT Body Activation. All purchases contribute to the platform's development.</p>
+                        <p class="text-lg font-bold text-green-600 mb-4">Current Price: 1 AGT-1 = [Variable Price]</p>
+                       
+                        <a href="${PAYPAL_LINK}" target="_blank"
+                           class="w-full flex items-center justify-center py-3 bg-blue-500 text-white font-bold rounded-lg shadow hover:bg-blue-600 transition"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2H9.5a2.5 2.5 0 010-5H12z"/></svg>
+                            Direct Purchase via PayPal.com
+                        </a>
+                        <p class="text-center text-sm text-gray-500 mt-2">Send inquiries to: <span class="font-mono text-gray-800">davidgomadza@hotmail.com</span></p>
+                    </div>
+
+                    <div class="p-4 bg-yellow-50 rounded-xl shadow-lg border border-yellow-300">
+                        <h3 class="text-xl font-semibold text-yellow-800 mb-3">Option 2: Pre-Verified AGT-2 Body Units</h3>
+                        <p class="text-gray-700 mb-4">Skip the World Chain step and purchase a block of AGT-2 units for immediate life-extension activation.</p>
+                        <p class="text-lg font-bold text-yellow-600 mb-4">Price: 1 AGT-2 Unit (8000 Years) = [Premium Price]</p>
+                         <a href="${PAYPAL_LINK}" target="_blank"
+                           class="w-full flex items-center justify-center py-3 bg-blue-500 text-white font-bold rounded-lg shadow hover:bg-blue-600 transition"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2H9.5a2.5 2.5 0 010-5H12z"/></svg>
+                            Direct Purchase via PayPal.com
+                        </a>
+                        <p class="text-center text-sm text-gray-500 mt-2">Send inquiries to: <span class="font-mono text-gray-800">davidgomadza@hotmail.com</span></p>
+                    </div>
+                </div>
+            `;
+        };
+
+        // --- Message Box / Modal Functions (In place of alert()) ---
+
+        const showMessage = (text) => {
+            document.getElementById('message-text').textContent = text;
+            document.getElementById('message-box').classList.remove('hidden');
+            document.getElementById('message-box').classList.add('flex');
+        };
+
+        const hideMessage = () => {
+            document.getElementById('message-box').classList.add('hidden');
+            document.getElementById('message-box').classList.remove('flex');
+        };
+       
+        // Expose functions to global scope for HTML event handlers
+        window.navigate = navigate;
+        window.performTransaction = performTransaction;
+        window.activateBodyAGT = activateBodyAGT;
+        window.hideMessage = hideMessage;
+
+
+        // --- App Start ---
+        window.onload = initFirebase;
+
+    </script>
+</body>
+</html>
+
+ 
 
